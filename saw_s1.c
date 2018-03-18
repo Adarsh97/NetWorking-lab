@@ -34,9 +34,19 @@ socklen_t h;
 Frame recv_frame;
 Frame send_frame;
 int counter=0;
-
+struct timeval timer;
+int selector;
+fd_set readfds;
+FD_SET(oldsocket,&readfds);
 while(1)
 {
+  timer.tv_sec=10;
+  timer.tv_usec=500;
+  selector=select(oldsocket+1,&readfds,NULL,NULL,&timer);
+  if(selector<0)
+  printf("select error ....\n");
+  else if(selector==0)
+  printf("Time out ......\n");
   h=sizeof(client);
   int  recv_size=recvfrom(oldsocket,&recv_frame,sizeof(Frame),0,(struct sockaddr*)&client,&h);
   if((recv_size > 0)&&(recv_frame.seq_no==counter))
